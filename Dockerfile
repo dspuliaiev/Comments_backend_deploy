@@ -44,7 +44,7 @@ WORKDIR /app
 COPY --from=builder /usr/local /usr/local
 
 # Копируем статические файлы из builder
-COPY --from=builder /app/static /app/static
+COPY --from=builder /app/staticfiles /app/staticfiles
 
 # Копируем оставшиеся файлы проекта
 COPY . /app/
