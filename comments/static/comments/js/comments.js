@@ -165,7 +165,7 @@ new Vue({
     this.loadPage(1);
 
     // Устанавливаем WebSocket-соединение
-    const socket = new WebSocket('ws://localhost:8000/ws/chat/');
+    const socket = new WebSocket('wss://comments-spa.koyeb.app/ws/chat/');
 
     socket.onopen = (event) => {
         console.log('Соединение установлено');
