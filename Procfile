@@ -1,1 +1,1 @@
-web: daphne backend.asgi:application --log-file -
+web: daphne backend.asgi:application
