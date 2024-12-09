@@ -43,8 +43,10 @@ WORKDIR /app
 # Копируем зависимости из builder
 COPY --from=builder /usr/local /usr/local
 
-# Копируем оставшиеся файлы проекта
+# Копируем статические файлы из builder
 COPY --from=builder /app/static /app/static
+
+# Копируем оставшиеся файлы проекта
 COPY . /app/
 
 # Команда для запуска Daphne
