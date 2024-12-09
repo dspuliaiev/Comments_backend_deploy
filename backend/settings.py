@@ -22,8 +22,8 @@ DEBUG = False
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.koyeb.app', '.console.neon.tech']
-CSRF_TRUSTED_ORIGINS = [ 'http://127.0.0.1',  'https://.koyeb.app', 'https://console.neon.tech']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'https://comments-spa.koyeb.app', '.console.neon.tech']
+CSRF_TRUSTED_ORIGINS = [ 'http://127.0.0.1',  'https://comments-spa.koyeb.app', 'https://console.neon.tech']
 
 BLEACH_ALLOWED_TAGS = ["a", "code", "i", "strong"]
 BLEACH_ALLOWED_ATTRIBUTES = {"a": ["href", "title"]}
