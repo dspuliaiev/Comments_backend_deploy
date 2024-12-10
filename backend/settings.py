@@ -149,9 +149,10 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-MEDIA_ROOT = BASE_DIR / "media"
-MEDIA_URL = "/media/"
-WHITENOISE_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_ROOT = BASE_DIR / "media"
+# MEDIA_URL = 'https://res.cloudinary.com/dygbbg4nm/'
+# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# WHITENOISE_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # Cloudinary settings

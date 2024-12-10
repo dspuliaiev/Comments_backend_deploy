@@ -1,4 +1,3 @@
-// commentComponent.js
 const Comment = {
     template: `
     <div class="comment-block">
@@ -12,11 +11,11 @@ const Comment = {
             <div class="comment-text" v-html="comment.text"></div>
             <div v-if="comment.text_file">
                 <p>Текстовый файл: {{ getFileName(comment.text_file) }}
-                    <a :href="comment.text_file" download>Скачать</a>
+                    <a :href="getTextFileUrl(comment.text_file)" download>Скачать</a>
                 </p>
             </div>
             <div v-if="comment.image">
-                <img :src="comment.image" alt="Image" @mouseover="imageHover(true)" @mouseout="imageHover(false)">
+                <img :src="getImageUrl(comment.image)" alt="Image" @mouseover="imageHover(true)" @mouseout="imageHover(false)">
             </div>
             <button class="reply" @click="showReplyForm(comment)">Ответить</button>
             <div v-if="replyToCommentId === comment.id">
@@ -52,9 +51,9 @@ const Comment = {
                                 <input type="file" id="image" class="custom-file-input" @change="handleImageUpload">
                             </div>
                             <div class="form-file">
-    <label for="text_file">Загрузить TXT-файл:</label>
-    <input type="file" id="text_file" name="text_file" class="custom-file-input" @change="handleFileUpload">
-</div>
+                                <label for="text_file">Загрузить TXT-файл:</label>
+                                <input type="file" id="text_file" name="text_file" class="custom-file-input" @change="handleFileUpload">
+                            </div>
                             <div class="form-field">
                                 <label for="captcha">Captcha:</label>
                             </div>
@@ -189,6 +188,13 @@ const Comment = {
                     }
                     console.error('Ошибка при отправке комментария:', error);
                 });
+        },
+        // Методы для обработки URL-адресов
+        getImageUrl(url) {
+            return this.$root.getImageUrl(url);
+        },
+        getTextFileUrl(url) {
+            return this.$root.getTextFileUrl(url);
         },
     },
 };

@@ -1,10 +1,10 @@
-// comments.js
+// Обновленный comments.js
 new Vue({
     el: '#app',
     data: {
         page: 1,
         total_pages: 1,
-        comments: [], // Инициализация массива комментариев
+        comments: [],
         showForm: false,
         commentForm: {
             user_name: '',
@@ -27,21 +27,56 @@ new Vue({
         },
     },
     methods: {
-        findCommentById(id, comments = this.comments) {
-        for (const comment of comments) {
-            if (comment.id === id) {
-                return comment;
+        // Метод для получения корректного пути для изображений
+        getImageUrl(url) {
+            console.log('Обрабатываем URL изображения:', url);
+            if (!url) return '';
+
+            // Удаляем лишний префикс, если он есть
+            if (url.startsWith('image/upload/')) {
+                url = url.replace('image/upload/', '');
             }
 
-            if (Array.isArray(comment.children)) {
-                const found = this.findCommentById(id, comment.children);
-                if (found) {
-                    return found;
+            const imageBasePath = 'https://res.cloudinary.com/dygbbg4nm/image/upload/';
+            if (url.startsWith(imageBasePath)) {
+                return url;
+            }
+            return url;
+        },
+
+        getTextFileUrl(url) {
+            console.log('Обрабатываем URL текстового файла:', url);
+            if (!url) return '';
+
+            // Удаляем лишний префикс, если он есть
+            if (url.startsWith('raw/upload/')) {
+                url = url.replace('raw/upload/', '');
+            }
+
+            const fileBasePath = 'https://res.cloudinary.com/dygbbg4nm/raw/upload/';
+            if (url.startsWith(fileBasePath)) {
+                return url;
+            }
+            return url;
+        },
+
+        // Функция для поиска комментария по ID
+        findCommentById(id, comments = this.comments) {
+            for (const comment of comments) {
+                if (comment.id === id) {
+                    return comment;
+                }
+                if (Array.isArray(comment.children)) {
+                    const found = this.findCommentById(id, comment.children);
+                    if (found) {
+                        return found;
+                    }
                 }
             }
-        }
-        return null;
-    },
+            return null;
+        },
+
+        // Получение капчи для формы
         getCaptcha() {
             axios.get('/get_captcha/')
                 .then(response => {
@@ -51,21 +86,31 @@ new Vue({
                     console.error('Ошибка при получении капчи:', error);
                 });
         },
+
+        // Обновление списка комментариев
         updateComments() {
             axios.get('/api/v1/comments/')
                 .then(response => {
-                    this.comments = response.data.comments;
+                    this.comments = response.data.comments.map(comment => ({
+                        ...comment,
+                        image: this.getImageUrl(comment.image),
+                        text_file: this.getTextFileUrl(comment.text_file),
+                    }));
                 })
                 .catch(error => {
                     console.error('Ошибка при загрузке данных:', error);
                 });
         },
+
+        // Очистка и обработка HTML перед отправкой
         sanitizeHTML(html) {
             return DOMPurify.sanitize(html, {
                 ALLOWED_TAGS: ['a', 'code', 'i', 'strong'],
                 ALLOWED_ATTR: ['href', 'title'],
             });
         },
+
+        // Вставка тегов в текст
         insertTag(tag) {
             const textArea = document.getElementById('text');
             const start = textArea.selectionStart;
@@ -79,10 +124,16 @@ new Vue({
             textArea.selectionStart = start + tag.length + selectedText.length * 2;
             textArea.selectionEnd = textArea.selectionStart;
         },
+
+        // Загрузка страницы комментариев
         loadPage(page) {
             axios.get(`/api/v1/comments/?page=${page}`)
                 .then(response => {
-                    this.comments = response.data.comments;
+                    this.comments = response.data.comments.map(comment => ({
+                        ...comment,
+                        image: this.getImageUrl(comment.image),
+                        text_file: this.getTextFileUrl(comment.text_file),
+                    }));
                     this.page = response.data.page;
                     this.total_pages = response.data.total_pages;
                 })
@@ -90,6 +141,8 @@ new Vue({
                     console.error('Ошибка при загрузке данных:', error);
                 });
         },
+
+        // Сортировка комментариев
         sortComments(sortBy) {
             let currentSortBy = sortBy;
             let currentOrder = 'asc';
@@ -105,28 +158,39 @@ new Vue({
 
             axios.get(postURL)
                 .then(response => {
-                    this.comments = response.data.comments;
+                    this.comments = response.data.comments.map(comment => ({
+                        ...comment,
+                        image: this.getImageUrl(comment.image),
+                        text_file: this.getTextFileUrl(comment.text_file),
+                    }));
                 })
                 .catch(error => {
                     console.error('Ошибка при загрузке данных:', error);
                 });
+
             const button = event.target;
             button.textContent = `${this.sortButtonTexts[currentSortBy]} (${currentOrder === 'asc' ? '↑' : '↓'})`;
         },
+
+        // Обработка загрузки изображения
         handleImageUpload(event) {
             this.commentForm.image = event.target.files[0];
         },
+
+        // Обработка загрузки файла
         handleFileUpload(event) {
             this.commentForm.file = event.target.files[0];
         },
+
+        // Показать/спрятать форму комментариев
         showCommentForm() {
+            this.showForm = !this.showForm;
             if (this.showForm) {
-                this.showForm = false;
-            } else {
-                this.showForm = true;
                 this.getCaptcha();
             }
         },
+
+        // Отправка комментария
         submitComment() {
             let formData = new FormData();
             formData.append('user_name', this.commentForm.user_name);
@@ -138,7 +202,6 @@ new Vue({
             formData.append('image', this.commentForm.image);
             formData.append('text_file', this.commentForm.file);
 
-            // Логируем данные перед отправкой
             console.log('Данные перед отправкой:', Array.from(formData.entries()));
 
             const postURL = '/api/v1/comments/create/';
@@ -147,10 +210,11 @@ new Vue({
                     'Content-Type': 'multipart/form-data',
                 },
             };
+
             axios.post(postURL, formData, config)
                 .then(response => {
                     this.showForm = false;
-                    this.updateComments(); // Обновляем список комментариев
+                    this.updateComments();
                 })
                 .catch(error => {
                     this.getCaptcha();
@@ -164,56 +228,42 @@ new Vue({
         },
     },
     created() {
-    this.updateComments();
-    this.loadPage(1);
+        this.updateComments();
+        this.loadPage(1);
 
-    // Устанавливаем WebSocket-соединение
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const host = window.location.host; // Текущий хост (например, localhost:8000 или example.com)
-    const socket = new WebSocket(`${protocol}://${host}/ws/chat/`);
+        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        const host = window.location.host;
+        const socket = new WebSocket(`${protocol}://${host}/ws/chat/`);
 
-    socket.onopen = (event) => {
-        console.log('Соединение установлено');
-    };
+        socket.onopen = () => {
+            console.log('Соединение установлено');
+        };
 
-    socket.onmessage = (event) => {
-        try {
-            const message = JSON.parse(event.data);
+        socket.onmessage = (event) => {
+            try {
+                const message = JSON.parse(event.data);
+                if (message.type === 'new_comment' && message.data) {
+                    const newComment = message.data;
+                    newComment.image = this.getImageUrl(newComment.image);
+                    newComment.text_file = this.getTextFileUrl(newComment.text_file);
 
-            if (message.type === 'new_comment' && message.data) {
-                const newComment = message.data;
-
-                // Проверка структуры нового комментария
-                if (typeof newComment.is_root === 'undefined') {
-                    console.error('Свойство is_root отсутствует у комментария:', newComment);
-                    return;
-                }
-
-                if (newComment.is_root) {
-                    // Добавляем корневой комментарий в начало списка (LIFO)
-                    this.comments.unshift(newComment);
-                } else {
-                    // Обновляем дочерний комментарий
-                    const parentComment = this.findCommentById(newComment.parent_comment_id);
-
-                    if (parentComment) {
-                        if (!Array.isArray(parentComment.children)) {
-                            parentComment.children = [];
-                        }
-                        parentComment.children.unshift(newComment);  // Добавляем в начало дочерних комментариев
+                    if (newComment.is_root) {
+                        this.comments.unshift(newComment);
                     } else {
-                        console.warn('Родительский комментарий не найден для:', newComment);
+                        const parentComment = this.findCommentById(newComment.parent_comment_id);
+                        if (parentComment) {
+                            if (!Array.isArray(parentComment.children)) {
+                                parentComment.children = [];
+                            }
+                            parentComment.children.unshift(newComment);
+                        } else {
+                            console.warn('Родительский комментарий не найден для:', newComment);
+                        }
                     }
                 }
-
-                console.log('Комментарии после обновления:', this.comments);
-            } else {
-                console.error('Некорректные данные WebSocket:', message);
+            } catch (error) {
+                console.error('Ошибка обработки сообщения WebSocket:', error);
             }
-        } catch (error) {
-            console.error('Ошибка обработки сообщения WebSocket:', error);
-        }
-    };
-
+        };
     },
 });

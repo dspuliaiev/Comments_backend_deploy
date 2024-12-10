@@ -1,4 +1,4 @@
-// csrf.js
+// Обновленный csrf.js
 function getCsrfToken() {
     const csrfTokenCookie = document.cookie
         .split('; ')
