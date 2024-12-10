@@ -168,7 +168,9 @@ new Vue({
     this.loadPage(1);
 
     // Устанавливаем WebSocket-соединение
-    const socket = new WebSocket('ws://localhost:8000/ws/chat/');
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const host = window.location.host; // Текущий хост (например, localhost:8000 или example.com)
+    const socket = new WebSocket(`${protocol}://${host}/ws/chat/`);
 
     socket.onopen = (event) => {
         console.log('Соединение установлено');
