@@ -138,6 +138,9 @@ new Vue({
             formData.append('image', this.commentForm.image);
             formData.append('text_file', this.commentForm.file);
 
+            // Логируем данные перед отправкой
+            console.log('Данные перед отправкой:', Array.from(formData.entries()));
+
             const postURL = '/api/v1/comments/create/';
             let config = {
                 header: {
@@ -165,7 +168,7 @@ new Vue({
     this.loadPage(1);
 
     // Устанавливаем WebSocket-соединение
-    const socket = new WebSocket('wss://comments-spa.koyeb.app/ws/chat/');
+    const socket = new WebSocket('ws://localhost:8000/ws/chat/');
 
     socket.onopen = (event) => {
         console.log('Соединение установлено');

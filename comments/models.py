@@ -1,5 +1,5 @@
 from django.db import models
-
+from cloudinary.models import CloudinaryField
 
 class ClientInfo(models.Model):
     ip_address = models.GenericIPAddressField()
@@ -16,12 +16,11 @@ class Comment(models.Model):
     parent_comment = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies_to')
     home_page = models.URLField(blank=True, verbose_name='Home Page')
     captcha = models.CharField(max_length=48, verbose_name='CAPTCHA', default='')
-    image = models.ImageField(upload_to='comment_images', null=True, blank=True, verbose_name='Upload Image',
-                              help_text='Upload an image (optional)')
-    text_file = models.FileField(upload_to='comment_text_files', null=True, blank=True,
-                                 verbose_name='Upload Text File', help_text='Upload a text file (optional)')
+    image = CloudinaryField('image', null=True, blank=True,  # Убираем verbose_name здесь
+                            help_text='Upload an image (optional)', resource_type='image')
+    text_file = CloudinaryField('text_file', null=True, blank=True,  # Убираем verbose_name здесь
+                                help_text='Upload a text file (optional)', resource_type='raw')
     client_info = models.ForeignKey(ClientInfo, on_delete=models.CASCADE, default='')
 
     def __str__(self):
         return f'Comment by {self.user_name} on {self.created_at}'
-

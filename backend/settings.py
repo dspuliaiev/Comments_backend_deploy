@@ -2,6 +2,9 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import dj_database_url
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 load_dotenv()
 
@@ -17,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
@@ -40,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'cloudinary',
     'channels',
     'captcha',
     'comments',
@@ -84,8 +88,6 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 #     },
 # }
 
-
-import os
 
 CHANNEL_LAYERS = {
     'default': {
@@ -150,6 +152,27 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_ROOT = BASE_DIR / "media"
 MEDIA_URL = "/media/"
 WHITENOISE_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# Cloudinary settings
+
+CLOUDINARY_NAME=os.getenv('CLOUDINARY_NAME')
+CLOUDINARY_API_KEY=os.getenv('CLOUDINARY_API_KEY')
+CLOUDINARY_API_SECRET=os.getenv('CLOUDINARY_API_SECRET')
+
+cloudinary.config(
+    cloud_name=CLOUDINARY_NAME,
+    api_key=CLOUDINARY_API_KEY,
+    api_secret=CLOUDINARY_API_SECRET
+)
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

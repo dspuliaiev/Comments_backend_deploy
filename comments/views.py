@@ -9,9 +9,6 @@ from rest_framework.response import Response
 from .serializers import CommentSerializer, ClientInfoSerializer
 import json
 from rest_framework import pagination
-from PIL import Image
-from io import BytesIO
-from django.core.files.uploadedfile import InMemoryUploadedFile
 from datetime import datetime
 from django.views import View
 from django_user_agents.utils import get_user_agent
@@ -22,6 +19,7 @@ from urllib.parse import unquote
 import logging
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+from .cloudinary_utils import upload_image_to_cloudinary, upload_text_file_to_cloudinary
 
 logger = logging.getLogger(__name__)
 
@@ -53,10 +51,11 @@ class CommentAPIView(APIView):
             comments = Comment.objects.order_by('-created_at')
 
         comments_dict = {comment.id: CommentSerializer(comment).data for comment in comments}
-
         parent_to_children = {}
         for comment in comments_dict.values():
-            comment['created_at'] = datetime.strptime(comment['created_at'], "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%H:%M %d.%m.%Y")
+            comment['created_at'] = datetime.strptime(
+                comment['created_at'], "%Y-%m-%dT%H:%M:%S.%fZ"
+            ).strftime("%H:%M %d.%m.%Y")
             parent_id = comment.get('parent_comment_id')
             if parent_id:
                 parent_to_children.setdefault(parent_id, []).append(comment)
@@ -115,54 +114,23 @@ class CommentAPIView(APIView):
             cleaned_text = clean(comment.text, tags=BLEACH_ALLOWED_TAGS, attributes=BLEACH_ALLOWED_ATTRIBUTES)
             comment.text = cleaned_text
 
-            if not validate_xhtml(comment.text):
-                return JsonResponse({'success': False, 'message': 'Invalid XHTML markup'}, status=400)
-
             # Обработка изображения
-            try:
-                image_tmp_file = request.FILES.get('image')
-                if image_tmp_file:
-                    valid_formats = ['image/jpeg', 'image/png', 'image/gif']
-                    if image_tmp_file.content_type not in valid_formats:
-                        return JsonResponse({'success': False, 'message': 'Недопустимый формат изображения'}, status=400)
-
-                    img = Image.open(image_tmp_file)
-                    width, height = img.size
-                    max_size = (320, 240)
-                    if width > max_size[0] or height > max_size[1]:
-                        img = img.resize(max_size)
-                        output_buffer = BytesIO()
-                        img.save(output_buffer, format=image_tmp_file.content_type.split('/')[-1].upper())
-                        image_tmp_file = InMemoryUploadedFile(output_buffer, 'ImageField', f'{image_tmp_file.name}',
-                                                              image_tmp_file.content_type, output_buffer.tell, None)
-
-                    comment.image = image_tmp_file
-
-            except Exception as e:
-                print(f"Ошибка при сохранении изображения: {e}")
+            image_file = request.FILES.get('image')
+            if image_file:
+                image_url, error_message = upload_image_to_cloudinary(image_file)
+                if not image_url:
+                    return JsonResponse({'success': False, 'message': error_message}, status=400)
+                comment.image = image_url
 
             # Обработка текстового файла
-            try:
-                file_tmp_file = request.FILES.get('text_file')
-                if not file_tmp_file:
-                    print("Файл text_file не передан в запросе.")
-                else:
-                    print(f"Получен файл: {file_tmp_file.name}, размер: {file_tmp_file.size} байт")
-                if file_tmp_file:
-                    if not file_tmp_file.name.endswith('.txt'):
-                        return JsonResponse({'success': False, 'message': 'Недопустимый формат файла. Разрешены только .txt файлы.'}, status=400)
-                    if file_tmp_file.size > 102400:  # 100 КБ
-                        return JsonResponse({'success': False, 'message': 'Файл слишком большой'}, status=400)
-
-                    comment.text_file = file_tmp_file
-                    new_name = comment.text_file.name.split('/')[-1]
-                    comment.text_file.name = new_name
-            except Exception as e:
-                print(f"Ошибка при сохранении файла: {e}")
-
+            text_file = request.FILES.get('text_file')
+            if text_file:
+                text_file_url, error_message = upload_text_file_to_cloudinary(text_file)
+                if not text_file_url:
+                    return JsonResponse({'success': False, 'message': error_message}, status=400)
+                comment.text_file = text_file_url
 
             comment.save()
-
 
             serialized_comment = CommentSerializer(comment).data
             channel_layer = get_channel_layer()
@@ -171,7 +139,7 @@ class CommentAPIView(APIView):
                 {"type": "broadcast_new_comment", "data": serialized_comment}
             )
 
-            return JsonResponse({'success': True, 'comment_id': comment.id})
+            return JsonResponse({'success': True, 'comment_id': comment.id, 'image_url': comment.image, 'text_file_url': comment.text_file})
         except Exception as e:
             logger.error(f"Ошибка при обработке комментария: {e}")
             return JsonResponse({'success': False, 'message': 'Ошибка на сервере'}, status=500)

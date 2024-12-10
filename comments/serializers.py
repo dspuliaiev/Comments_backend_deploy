@@ -1,12 +1,10 @@
 from rest_framework import serializers
 from .models import Comment, ClientInfo
 
-
 class CommentSerializer(serializers.ModelSerializer):
     is_root = serializers.SerializerMethodField()
     parent_comment_id = serializers.SerializerMethodField()
     children = serializers.SerializerMethodField()
-    text_file = serializers.FileField()
 
     class Meta:
         model = Comment
