@@ -1,8 +1,7 @@
 # SPA-Comments
 
 ### Description
-SPA-Comments is a full-featured single page application (SPA) designed to provide real-time dynamic user interaction. This project demonstrates the integration of a modern SPA frontend with a powerful Django backend.
-
+SPA-Comments is a full-featured single page application (SPA) designed to provide real-time dynamic user interaction. Users can leave comments, reply to comments, attach media and text files to comments. This project demonstrates the integration of modern SPA frontend Vue.js with powerful Django backend DRF.
 ## Technologies
 
 - **Django**: a backend framework that offers a robust and scalable architecture for server-side logic.
@@ -15,36 +14,6 @@ SPA-Comments is a full-featured single page application (SPA) designed to provid
 - **Sort**: for sorting by fields such as date, Email, username.
 - **Default LIFO sort**: 
 
-## Installation
-1. **Clone the repository**:
-    ```bash
-    git clone https://github.com/dspuliaiev/Comments_SPA    
-    ```
-2. **Make sure you have Poetry installed. Activate the Poetry virtual environment:**:
-    ```bash
-    poetry shell    
-    ```
-3. **Install dependencies**:
-    ```bash
-    poetry install    
-    ```
-    
-4. **First terminal:**: (Make sure you have Docker installed) :**:
-    ```bash
-    docker-compose up     
-   ```
-   
-5. **Second terminal**:
-    ```bash
-    python manage.py makemigrations
-    python manage.py migrate
-   ```
 
-6. **Third terminal**:
-    ```bash  
-   daphne backend.asgi:application   
-   ```
-
-7. **Open http://localhost:8000 in a browser. You should see the main page.**:
 
 
