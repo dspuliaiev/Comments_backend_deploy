@@ -5,7 +5,7 @@ from captcha.fields import CaptchaField
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ['user_name', 'email', 'home_page', 'captcha', 'text', 'image', ]
+        fields = ['user_name', 'email', 'home_page', 'captcha', 'text', 'image', 'text_file']
 
     user_name = forms.CharField(label='User Name', max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
     email = forms.EmailField(label='E-mail', widget=forms.EmailInput(attrs={'class': 'form-control'}))
