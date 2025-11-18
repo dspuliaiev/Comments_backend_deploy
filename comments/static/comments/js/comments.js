@@ -21,9 +21,9 @@ new Vue({
         errorMessage: '',
         comment_form: {},
         sortButtonTexts: {
-            'user_name': 'Имени',
+            'user_name': 'Name',
             'email': 'E-mail',
-            'date_added': 'Дате',
+            'date_added': 'Date',
         },
     },
     methods: {

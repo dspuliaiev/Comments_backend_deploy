@@ -11,25 +11,25 @@ const Comment = {
             <div class="comment-text" v-html="comment.text"></div>
             <div v-if="comment.text_file">
                 <p>Текстовый файл: {{ getFileName(comment.text_file) }}
-                    <a :href="getTextFileUrl(comment.text_file)" download>Скачать</a>
+                    <a :href="getTextFileUrl(comment.text_file)" download>Download</a>
                 </p>
             </div>
             <div v-if="comment.image">
                 <img :src="getImageUrl(comment.image)" alt="Image" @mouseover="imageHover(true)" @mouseout="imageHover(false)">
             </div>
-            <button class="reply" @click="showReplyForm(comment)">Ответить</button>
+            <button class="reply" @click="showReplyForm(comment)">Reply</button>
             <div v-if="replyToCommentId === comment.id">
                 <section class="comment-form slide-in" id="ugcNewComment">
-                    <h3 class="section-title">Оставьте ваш комментарий</h3>
+                    <h3 class="section-title">Leave your comment</h3>
                     <form @submit.prevent="submitComment">
                         {{ comment_form.non_field_errors }}
                         <div class="form-group">
                             <div class="form-field">
-                                <label for="user_name">Имя:</label>
+                                <label for="user_name">Name:</label>
                                 <input v-model="commentForm.user_name" type="text" id="user_name" class="form-control" placeholder="Ваше имя">
                             </div>
                             <div class="form-field">
-                                <label for="home_page">Сайт:</label>
+                                <label for="home_page">Site:</label>
                                 <input v-model="commentForm.home_page" type="text" id="home_page" class="form-control" placeholder="Ваш сайт">
                             </div>
                             <div class="form-field">
@@ -37,7 +37,7 @@ const Comment = {
                                 <input v-model="commentForm.email" type="text" id="email" class="form-control" placeholder="youremail@example.com">
                             </div>
                             <div class="form-field">
-                                <label for="text">Текст:</label>
+                                <label for="text">Text:</label>
                                 <div class="tag-buttons">
                                     <button type="button" @click="insertTag('[i]')">[i]</button>
                                     <button type="button" @click="insertTag('[strong]')">[strong]</button>
@@ -47,11 +47,11 @@ const Comment = {
                                 <textarea v-model="commentForm.text" id="text" class="form-control" rows="6" cols="20" placeholder="Ваш комментарий"></textarea>
                             </div>
                             <div class="form-file">
-                                <label for="image">Загрузить фото:</label>
+                                <label for="image">Download image:</label>
                                 <input type="file" id="image" class="custom-file-input" @change="handleImageUpload">
                             </div>
                             <div class="form-file">
-                                <label for="text_file">Загрузить TXT-файл:</label>
+                                <label for="text_file">Download TXT-file:</label>
                                 <input type="file" id="text_file" name="text_file" class="custom-file-input" @change="handleFileUpload">
                             </div>
                             <div class="form-field">
@@ -66,7 +66,7 @@ const Comment = {
                             </div>
                         </div>
                         <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
-                        <button type="submit">Отправить</button>
+                        <button type="submit">Send</button>
                     </form>
                 </section>
             </div>
