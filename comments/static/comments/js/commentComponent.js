@@ -59,7 +59,7 @@ const Comment = {
                             </div>
                             <div class="form-captcha-image">
                                 <img v-if="commentForm.captcha" :src="commentForm.captcha.image_url" alt="Captcha">
-                                <button class="captcha-button" type="button" @click="getCaptcha()">Обновить</button>
+                                <button class="captcha-button" type="button" @click="getCaptcha()">Update</button>
                             </div>
                             <div class="form-field">
                                 <input v-model="commentForm.captcha.value" type="text" id="captcha" class="form-control" placeholder="Введите код с изображения">
