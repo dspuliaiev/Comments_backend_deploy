@@ -49,9 +49,6 @@ COPY --from=builder /app/staticfiles /app/staticfiles
 # Копируем оставшиеся файлы проекта
 COPY . /app/
 
-# Копируем файл .env
-COPY .env /app/.env
-
 # Команда для миграций и запуска Daphne
 CMD ["sh", "-c", "python manage.py migrate && daphne -b 0.0.0.0 -p 8000 backend.asgi:application"]
 
