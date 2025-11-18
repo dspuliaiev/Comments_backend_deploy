@@ -13,16 +13,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем requirements.txt
+# Копируем файл зависимостей
 COPY requirements.txt /app/
 
-# Обновляем pip и устанавливаем зависимости
+# Устанавливаем зависимости
 RUN pip install --upgrade pip --no-cache-dir && pip install -r requirements.txt
 
 # Копируем оставшиеся файлы проекта
 COPY . /app/
 
-# Собираем статику
+# Собираем статические файлы
 RUN python manage.py collectstatic --noinput
 
 # Stage 2: Final
@@ -32,13 +32,13 @@ FROM python:3.12-bullseye
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Обновляем пакеты и устанавливаем runtime зависимости
+# Устанавливаем рабочую директорию
+WORKDIR /app
+
+# Устанавливаем runtime зависимости
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev zlib1g \
     && rm -rf /var/lib/apt/lists/*
-
-# Устанавливаем рабочую директорию
-WORKDIR /app
 
 # Копируем зависимости из builder
 COPY --from=builder /usr/local /usr/local
@@ -49,6 +49,10 @@ COPY --from=builder /app/staticfiles /app/staticfiles
 # Копируем оставшиеся файлы проекта
 COPY . /app/
 
-# Команда для запуска Daphne
-CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "backend.asgi:application"]
+# Копируем файл .env
+COPY .env /app/.env
+
+# Команда для миграций и запуска Daphne
+CMD ["sh", "-c", "python manage.py migrate && daphne -b 0.0.0.0 -p 8000 backend.asgi:application"]
+
 

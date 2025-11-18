@@ -11,35 +11,35 @@
 <body>
 <div class="container">
     <header class="header">
-        <h1>КОММЕНТАРИИ</h1>
+        <h1>COMMENTS</h1>
     </header>
     <div id="app">
         <div class="comments">
             <h2 class="h7y6"></h2>
             <ul>
                 <div class="comment-sort">
-                    <p>Сортировать по:
-                        <button @click="sortComments('user_name')">Имени</button>
+                    <p>Sort by:
+                        <button @click="sortComments('user_name')">Name</button>
                         <button @click="sortComments('email')">E-mail</button>
-                        <button @click="sortComments('date_added')">Дате</button>
+                        <button @click="sortComments('date_added')">Date</button>
                     </p>
                 </div>
-                <button class="add-comment-button" @click="showCommentForm">Добавить комментарий</button>
+                <button class="add-comment-button" @click="showCommentForm">Add a comment</button>
                 <div v-if="showForm">
                     <section class="comment-form slide-in" id="ugcNewComment">
-                        <h3 class="section-title">Оставьте ваш комментарий</h3>
+                        <h3 class="section-title">Leave your comment</h3>
                         <form @submit.prevent="submitComment()">
                             {{ comment_form.non_field_errors }}
                             <div class="form-group">
                                 <div class="form-field">
-                                    <label for="user_name">Имя:</label>
+                                    <label for="user_name">Name:</label>
                                     <input v-model="commentForm.user_name" type="text" id="user_name"
-                                           class="form-control" placeholder="Ваше имя">
+                                           class="form-control" placeholder="Your name">
                                 </div>
                                 <div class="form-field">
-                                    <label for="home_page">Сайт:</label>
+                                    <label for="home_page">Website:</label>
                                     <input v-model="commentForm.home_page" type="text" id="home_page"
-                                           class="form-control" placeholder="Ваш сайт">
+                                           class="form-control" placeholder="Your website">
                                 </div>
                                 <div class="form-field">
                                     <label for="email">E-mail:</label>
@@ -47,7 +47,7 @@
                                            placeholder="youremail@example.com">
                                 </div>
                                 <div class="form-field">
-                                    <label for="text">Текст:</label>
+                                    <label for="text">Text:</label>
                                     <div class="tag-buttons">
                                         <button type="button" @click="insertTag('[i]')">[i]</button>
                                         <button type="button" @click="insertTag('[strong]')">[strong]</button>
@@ -55,14 +55,14 @@
                                         <button type="button" @click="insertTag('[a]')">[a]</button>
                                     </div>
                                     <textarea v-model="commentForm.text" id="text" class="form-control" rows="6"
-                                              cols="20" placeholder="Ваш комментарий"></textarea>
+                                              cols="20" placeholder="Your comment"></textarea>
                                 </div>
                                 <div class="form-file">
-                                    <label for="image">Загрузить фото:</label>
+                                    <label for="image">Upload image:</label>
                                     <input type="file" id="image" class="custom-file-input" @change="handleImageUpload">
                                 </div>
                                 <div class="form-file">
-                                    <label for="text_file">Загрузить TXT-файл:</label>
+                                    <label for="text_file">Upload TXT file:</label>
                                     <input type="file" id="text_file" name="text_file" class="custom-file-input"
                                            @change="handleFileUpload">
                                 </div>
@@ -71,15 +71,15 @@
                                 </div>
                                 <div class="form-captcha-image">
                                     <img v-if="commentForm.captcha" :src="commentForm.captcha.image_url" alt="Captcha">
-                                    <button class="captcha-button" type="button" @click="getCaptcha()">Обновить</button>
+                                    <button class="captcha-button" type="button" @click="getCaptcha()">Refresh</button>
                                 </div>
                                 <div class="form-field">
                                     <input v-model="commentForm.captcha.value" type="text" id="captcha"
-                                           class="form-control" placeholder="Введите код с изображения">
+                                           class="form-control" placeholder="Enter code from image">
                                 </div>
                             </div>
                             <div v-if="errorMessage" class="error-message"><span v-text="errorMessage"></span></div>
-                            <button type="submit">Отправить</button>
+                            <button type="submit">Submit</button>
                         </form>
                     </section>
                 </div>
@@ -88,12 +88,12 @@
                 </li>
             </ul>
             <div class="pagination">
-                <button @click="loadPage(parseInt(page) - 1)" :disabled="parseInt(page) === parseInt(1)">Предыдущая
-                    страница
+                <button @click="loadPage(parseInt(page) - 1)" :disabled="parseInt(page) === parseInt(1)">
+                    Previous page
                 </button>
-                <span v-text="'Страница ' + page + ' из ' + total_pages"></span>
+                <span v-text="'Page ' + page + ' of ' + total_pages"></span>
                 <button @click="loadPage(parseInt(page) + 1)" :disabled="parseInt(page) === parseInt(total_pages)">
-                    Следующая страница
+                    Next page
                 </button>
             </div>
         </div>
